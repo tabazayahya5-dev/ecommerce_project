@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>المتجر الإلكتروني - المنتجات</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .container { display: flex; gap: 30px; }
+        .sidebar { width: 200px; background: #f4f4f4; padding: 15px; border-radius: 8px; }
+        .products-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+        .product-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; width: 200px; }
+    </style>
+</head>
+<body>
+
+    <h1>متجرنا الإلكتروني</h1>
+
+    <div class="container">
+        <!-- قائمة الأقسام -->
+        <div class="sidebar">
+            <h3>الأقسام</h3>
+            <ul>
+                {% for category in categories %}
+                    <li>{{ category.name }}</li>
+                {% empty %}
+                    <li>لا توجد أقسام</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- قائمة المنتجات -->
+        <div class="products-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    <h3>{{ product.name }}</h3>
+                    <p>السعر: ${{ product.price }}</p>
+                    <p>المخزون: {{ product.stock }}</p>
+                </div>
+            {% empty %}
+                <p>لا توجد منتجات حالياً.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>
