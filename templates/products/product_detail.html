@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.name }}</title>
+    <style>
+        body { font-family: sans-serif; margin: 30px; line-height: 1.6; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #333; text-decoration: none; }
+        .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; max-width: 500px; }
+        .price { font-size: 1.4em; color: green; font-weight: bold; }
+        .btn { background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <a href="{% url 'products:product_list' %}" class="back-link">← العودة لقائمة المنتجات</a>
+
+    <div class="card">
+        <h1>{{ product.name }}</h1>
+        <p><strong>القسم:</strong> {{ product.category.name }}</p>
+        <p><strong>الوصف:</strong> {{ product.description|default:"لا يوجد وصف متوفر" }}</p>
+        <p class="price">السعر: ${{ product.price }}</p>
+        <p><strong>المخزون المتوفر:</strong> {{ product.stock }} قطعة</p>
+
+        <button class="btn">إضافة إلى السلة 🛒</button>
+    </div>
+
+</body>
+</html>
