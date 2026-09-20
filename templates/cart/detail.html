@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>سلة التسوق 🛒</title>
+</head>
+<body>
+    <h1>سلة التسوق الخاصة بك</h1>
+
+    {% if cart %}
+        <table border="1" cellpadding="10">
+            <thead>
+                <tr>
+                    <th>المنتج</th>
+                    <th>الكمية</th>
+                    <th>سعر القطعة</th>
+                    <th>الإجمالي</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.price }}</td>
+                        <td>${{ item.total_price }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <h3>المجموع الكلي: ${{ cart.get_total_price }}</h3>
+    {% else %}
+        <p>السلة فارغة حالياً!</p>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'products:product_list' %}">← العودة للمنتجات</a>
+</body>
+</html>

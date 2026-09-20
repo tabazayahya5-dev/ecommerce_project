@@ -22,7 +22,10 @@
         <p class="price">السعر: ${{ product.price }}</p>
         <p><strong>المخزون المتوفر:</strong> {{ product.stock }} قطعة</p>
 
-        <button class="btn">إضافة إلى السلة 🛒</button>
+        <form action="{% url 'cart:cart_add' product.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">إضافة إلى السلة 🛒</button>
+        </form>
     </div>
 
 </body>
