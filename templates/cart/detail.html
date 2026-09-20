@@ -13,8 +13,10 @@
                 <tr>
                     <th>المنتج</th>
                     <th>الكمية</th>
+                    <th>تعديل الكمية</th>
                     <th>سعر القطعة</th>
                     <th>الإجمالي</th>
+                    <th>حذف</th>
                 </tr>
             </thead>
             <tbody>
@@ -22,8 +24,24 @@
                     <tr>
                         <td>{{ item.product.name }}</td>
                         <td>{{ item.quantity }}</td>
+                        <td>
+                            <!-- نموذج تعديل الكمية -->
+                            <form action="{% url 'cart:cart_add' item.product.id %}" method="post">
+                                {% csrf_token %}
+                                {{ item.update_quantity_form.quantity }}
+                                {{ item.update_quantity_form.override }}
+                                <input type="submit" value="تحديث">
+                            </form>
+                        </td>
                         <td>${{ item.price }}</td>
                         <td>${{ item.total_price }}</td>
+                        <td>
+                            <!-- نموذج حذف المنتج من السلة -->
+                            <form action="{% url 'cart:cart_remove' item.product.id %}" method="post">
+                                {% csrf_token %}
+                                <input type="submit" value="❌ حذف">
+                            </form>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
