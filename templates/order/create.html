@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>إتمام الشراء - Checkout 💳</title>
+</head>
+<body>
+    <h1>إتمام الطلب (Checkout)</h1>
+
+    <!-- ملخص السلة -->
+    <div>
+        <h3>ملخص طلبيتك:</h3>
+        <ul>
+            {% for item in cart %}
+                <li>
+                    {{ item.quantity }}x {{ item.product.name }}
+                    <span>- ${{ item.total_price }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <p><strong>المجموع الكلي: ${{ cart.get_total_price }}</strong></p>
+    </div>
+
+    <hr>
+
+    <!-- نموذج بيانات الشحن -->
+    <h3>بيانات الشحن والتوصيل:</h3>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><input type="submit" value="تأكيد الطلب والتنفيذ"></p>
+    </form>
+
+    <a href="{% url 'cart:cart_detail' %}">← العودة للسلة</a>
+</body>
+</html>

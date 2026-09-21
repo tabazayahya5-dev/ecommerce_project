@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django.conf import settings
 from products.models import Product
-
+import copy
 class Cart:
     def __init__(self , request):
         self.session = request.session
@@ -11,6 +11,9 @@ class Cart:
             cart = self.session['session_key'] = {}
 
         self.cart =cart
+
+    def __len__(self):
+        return sum(item['quantity'] for item in self.cart.values())
 
     def add(self , product , quantity=1 , override_quantity=False ):
         product_id = str(product.id)
@@ -41,13 +44,12 @@ class Cart:
         product_ids = self.cart.keys()
         products = Product.objects.filter(id__in=product_ids)
         
-        cart = self.cart.copy()
-
-        # إسناد كائن المنتج نفسه إلى قاموس السلة
+        cart = copy.deepcopy(self.cart)
+        
         for product in products:
             cart[str(product.id)]['product'] = product
 
-        # حساب سعر الكمية الكلي للقطعة وتحويل السعر إلى Decimal
+
         for item in cart.values():
             item['price'] = Decimal(item['price'])
             item['total_price'] = item['price'] * item['quantity']
@@ -57,5 +59,7 @@ class Cart:
         return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
 
     def clear(self):
-        del self.session[settings.CART_SESSION_ID]
-        self.save()
+        self.cart = {}
+        self.session[settings.CART_SESSION_ID] = {}
+        self.session.modified = True
+

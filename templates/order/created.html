@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تم بنجاح! 🎉</title>
+</head>
+<body>
+    <h1>شكراً لك! تم استلام طلبك بنجاح 🎉</h1>
+    <p>رقم الطلب الخاص بك هو: <strong>#{{ order.id }}</strong></p>
+    <p>سنقوم بإنهاء إجراءات الشحن والتوصيل في أقرب وقت.</p>
+
+    <br>
+    <a href="{% url 'products:product_list' %}">← متابعة التسوق</a>
+</body>
+</html>
