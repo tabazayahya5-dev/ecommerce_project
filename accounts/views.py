@@ -39,10 +39,10 @@ def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()  
-            login(request, user)  
-            messages.success(request, "تم إنشاء حسابك بنجاح! مرحباً بك.")
-            return redirect('accounts:profile')
+            form.save()  
+            #login(request, user)  
+            messages.success(request, "تم إنشاء حسابك بنجاح! يمكنك الآن تسجيل الدخول.")
+            return redirect('accounts:login')
         else:
             messages.error(request, "يرجى تصحيح الأخطاء الموضحة أدناه.")
     else:
@@ -50,6 +50,10 @@ def register_view(request):
 
     return render(request, 'accounts/register.html', {'form': form })
 
+def logout_view(request):
+    logout(request)
+    messages.info(request, "تم تسجيل الخروج بنجاح.")
+    return redirect('accounts:login')
 
 @login_required
 def profile_view(request):

@@ -19,6 +19,7 @@
                     <p class="card-text"><strong>اسم المستخدم:</strong> {{ user.username }}</p>
                     <p class="card-text"><strong>البريد الإلكتروني:</strong> {{ user.email }}</p>
                     <p class="card-text"><strong>تاريخ الانضمام:</strong> {{ user.date_joined|date:"d M Y" }}</p>
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger">تسجيل الخروج</a>
                 </div>
             </div>
         </div>
