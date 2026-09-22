@@ -1,26 +1,20 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفاصيل الطلب #{{ order.id }}</title>
-    <!-- Bootstrap RTL CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
-</head>
-<body class="bg-light">
+{% extends 'base.html' %}
 
-<div class="container my-5">
+{% block title %}تفاصيل الطلب #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>تفاصيل الطلب #{{ order.id }}</h2>
-        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">العودة لسجل الطلبات</a>
+        <h2 class="fw-bold mb-0">تفاصيل الطلب #{{ order.id }}</h2>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm">العودة لسجل الطلبات</a>
     </div>
 
     <div class="row">
         <!-- معلومات الشحن والعنوان -->
         <div class="col-md-4 mb-4">
-            <div class="card shadow-sm mb-3">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">بيانات الشحن</h5>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title fw-bold mb-0">بيانات الشحن</h5>
                 </div>
                 <div class="card-body">
                     <p class="card-text"><strong>الاسم:</strong> {{ order.first_name }} {{ order.last_name }}</p>
@@ -28,7 +22,7 @@
                     <p class="card-text"><strong>العنوان:</strong> {{ order.address }}</p>
                     <p class="card-text"><strong>المدينة:</strong> {{ order.city }}</p>
                     <p class="card-text"><strong>التاريخ:</strong> {{ order.created_at|date:"Y-m-d H:i" }}</p>
-                    <p class="card-text">
+                    <p class="card-text mb-0">
                         <strong>حالة الدفع:</strong> 
                         {% if order.paid %}
                             <span class="badge bg-success">تم الدفع</span>
@@ -42,13 +36,13 @@
 
         <!-- المنتجات المطلوبة -->
         <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">العناصر المطلوبة</h5>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title fw-bold mb-0">العناصر المطلوبة</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table align-middle">
+                        <table class="table align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th>المنتج</th>
@@ -63,14 +57,14 @@
                                         <td>{{ item.product.name }}</td>
                                         <td>${{ item.price }}</td>
                                         <td>{{ item.quantity }}</td>
-                                        <td>${{ item.get_cost }}</td>
+                                        <td class="fw-bold">${{ item.get_cost }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="3" class="text-start"><strong>المجموع الكلي:</strong></td>
-                                    <td><strong>${{ order.get_total_cost }}</strong></td>
+                                    <td colspan="3" class="text-start fw-bold">المجموع الكلي:</td>
+                                    <td class="fw-bold text-success fs-5">${{ order.get_total_cost }}</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -80,6 +74,4 @@
         </div>
     </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

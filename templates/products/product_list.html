@@ -1,46 +1,67 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <title>المتجر الإلكتروني - المنتجات</title>
-    <style>
-        body { font-family: sans-serif; margin: 20px; }
-        .container { display: flex; gap: 30px; }
-        .sidebar { width: 200px; background: #f4f4f4; padding: 15px; border-radius: 8px; }
-        .products-grid { display: flex; gap: 20px; flex-wrap: wrap; }
-        .product-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; width: 200px; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <h1>متجرنا الإلكتروني</h1>
+{% block title %}المتجر الإلكتروني - المنتجات{% endblock %}
 
-    <div class="container">
-        <!-- قائمة الأقسام -->
-        <div class="sidebar">
-            <h3>الأقسام</h3>
-            <ul>
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white fw-bold">
+                <i class="fa-solid fa-layer-group me-1"></i> الأقسام
+            </div>
+            <ul class="list-group list-group-flush">
                 {% for category in categories %}
-                    <li>{{ category.name }}</li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ category.name }}
+                    </li>
                 {% empty %}
-                    <li>لا توجد أقسام</li>
+                    <li class="list-group-item text-muted">لا توجد أقسام</li>
                 {% endfor %}
             </ul>
         </div>
+    </div>
 
-        <!-- قائمة المنتجات -->
-        <div class="products-grid">
+    <div class="col-md-9">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% for product in products %}
-                <div class="product-card">
-                    <h3><a href="{% url 'products:product_detail' product.slug %}">{{ product.name }}</a></h3>
-                    <p>السعر: ${{ product.price }}</p>
-                    <p>المخزون: {{ product.stock }}</p>
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow transition">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top p-3 rounded" style="height: 200px; object-fit: contain;" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 200px;">
+                                <i class="fa-solid fa-image fa-3x"></i>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title h6 fw-bold mb-2">
+                                <a href="{% url 'products:product_detail' product.slug %}" class="text-decoration-none text-dark">
+                                    {{ product.name }}
+                                </a>
+                            </h5>
+                            
+                            <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+                                <span class="fs-5 fw-bold text-success">${{ product.price }}</span>
+                                <span class="badge bg-secondary">المخزون: {{ product.stock }}</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 pb-3 pt-0">
+                            <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-outline-primary btn-sm w-100">
+                                عرض التفاصيل
+                            </a>
+                        </div>
+                    </div>
                 </div>
             {% empty %}
-                <p>لا توجد منتجات حالياً.</p>
+                <div class="col-12">
+                    <div class="alert alert-info text-center" role="alert">
+                        لا توجد منتجات حالياً.
+                    </div>
+                </div>
             {% endfor %}
         </div>
     </div>
-
-</body>
-</html>
+</div>
+{% endblock %}

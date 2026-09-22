@@ -1,32 +1,50 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ product.name }}</title>
-    <style>
-        body { font-family: sans-serif; margin: 30px; line-height: 1.6; }
-        .back-link { display: inline-block; margin-bottom: 20px; color: #333; text-decoration: none; }
-        .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; max-width: 500px; }
-        .price { font-size: 1.4em; color: green; font-weight: bold; }
-        .btn { background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <a href="{% url 'products:product_list' %}" class="back-link">← العودة لقائمة المنتجات</a>
+{% block title %}{{ product.name }}{% endblock %}
 
-    <div class="card">
-        <h1>{{ product.name }}</h1>
-        <p><strong>القسم:</strong> {{ product.category.name }}</p>
-        <p><strong>الوصف:</strong> {{ product.description|default:"لا يوجد وصف متوفر" }}</p>
-        <p class="price">السعر: ${{ product.price }}</p>
-        <p><strong>المخزون المتوفر:</strong> {{ product.stock }} قطعة</p>
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="fa-solid fa-arrow-right me-1"></i> العودة لقائمة المنتجات
+    </a>
+</div>
 
-        <form action="{% url 'cart:cart_add' product.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit">إضافة إلى السلة 🛒</button>
-        </form>
+<div class="card border-0 shadow-sm p-4">
+    <div class="row g-4 align-items-center">
+        <div class="col-md-5 text-center">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded" style="max-height: 350px; object-fit: contain;" alt="{{ product.name }}">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center text-muted rounded" style="height: 300px;">
+                    <i class="fa-solid fa-image fa-5x"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-7">
+            <h1 class="fw-bold mb-3">{{ product.name }}</h1>
+            
+            <p class="text-muted mb-2">
+                <i class="fa-solid fa-tag me-1"></i> <strong>القسم:</strong> {{ product.category.name }}
+            </p>
+
+            <p class="mb-4">
+                <strong>الوصف:</strong><br>
+                {{ product.description|default:"لا يوجد وصف متوفر لهذا المنتج حالياً." }}
+            </p>
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <span class="fs-2 fw-bold text-success">${{ product.price }}</span>
+                <span class="badge bg-secondary p-2">المخزون المتوفر: {{ product.stock }} قطعة</span>
+            </div>
+
+            <form action="{% url 'cart:cart_add' product.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-lg px-4">
+                    <i class="fa-solid fa-cart-plus me-2"></i> إضافة إلى السلة
+                </button>
+            </form>
+        </div>
     </div>
-
-</body>
-</html>
+</div>
+{% endblock %}

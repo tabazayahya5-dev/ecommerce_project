@@ -1,58 +1,72 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <title>سلة التسوق 🛒</title>
-</head>
-<body>
-    <h1>سلة التسوق الخاصة بك</h1>
+{% extends 'base.html' %}
 
-    {% if cart %}
-        <table border="1" cellpadding="10">
-            <thead>
-                <tr>
-                    <th>المنتج</th>
-                    <th>الكمية</th>
-                    <th>تعديل الكمية</th>
-                    <th>سعر القطعة</th>
-                    <th>الإجمالي</th>
-                    <th>حذف</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart %}
+{% block title %}سلة التسوق 🛒{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold mb-4">سلة التسوق الخاصة بك</h2>
+
+{% if cart %}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td>{{ item.product.name }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>
-                            <form action="{% url 'cart:cart_add' item.product.id %}" method="post">
-                                {% csrf_token %}
-                                {{ item.update_quantity_form.quantity }}
-                                {{ item.update_quantity_form.override }}
-                                <input type="submit" value="تحديث">
-                            </form>
-                        </td>
-                        <td>${{ item.price }}</td>
-                        <td>${{ item.total_price }}</td>
-                        <td>
-                            <form action="{% url 'cart:cart_remove' item.product.id %}" method="post">
-                                {% csrf_token %}
-                                <input type="submit" value="❌ حذف">
-                            </form>
-                        </td>
+                        <th scope="col">المنتج</th>
+                        <th scope="col" class="text-center">الكمية</th>
+                        <th scope="col" class="text-center">تعديل الكمية</th>
+                        <th scope="col">سعر القطعة</th>
+                        <th scope="col">الإجمالي</th>
+                        <th scope="col" class="text-center">حذف</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        
-        <h3>المجموع الكلي: ${{ cart.get_total_price }}</h3>
-        <br>
-        <a href="{% url 'orders:order_create' %}">إتمام الشراء (Checkout) ←</a>
-    {% else %}
-        <p>السلة فارغة حالياً!</p>
-    {% endif %}
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                        <tr>
+                            <td class="fw-bold">{{ item.product.name }}</td>
+                            <td class="text-center">{{ item.quantity }}</td>
+                            <td class="text-center" style="max-width: 160px;">
+                                <form action="{% url 'cart:cart_add' item.product.id %}" method="post" class="d-flex align-items-center justify-content-center gap-1">
+                                    {% csrf_token %}
+                                    {{ item.update_quantity_form.quantity }}
+                                    {{ item.update_quantity_form.override }}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">تحديث</button>
+                                </form>
+                            </td>
+                            <td>${{ item.price }}</td>
+                            <td class="fw-bold text-success">${{ item.total_price }}</td>
+                            <td class="text-center">
+                                <form action="{% url 'cart:cart_remove' item.product.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fa-solid fa-trash me-1"></i> حذف
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <br><br>
-    <a href="{% url 'products:product_list' %}">← العودة للمنتجات</a>
-</body>
-</html>
+    <div class="card border-0 shadow-sm p-3 mb-4 bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="m-0 fw-bold">المجموع الكلي: <span class="text-success">${{ cart.get_total_price }}</span></h4>
+            <a href="{% url 'orders:order_create' %}" class="btn btn-success btn-lg">
+                <i class="fa-solid fa-credit-card me-1"></i> إتمام الشراء (Checkout)
+            </a>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-info text-center py-4" role="alert">
+        <i class="fa-solid fa-cart-arrow-down fa-2x mb-2 d-block"></i>
+        السلة فارغة حالياً!
+    </div>
+{% endif %}
+
+<div>
+    <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-arrow-right me-1"></i> العودة للمنتجات
+    </a>
+</div>
+{% endblock %}

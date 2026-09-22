@@ -1,64 +1,53 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إنشاء حساب جديد</title>
-    <!-- Bootstrap RTL CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
-</head>
-<body class="bg-light d-flex align-items-center justify-content-center my-5">
+{% extends 'base.html' %}
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h3 class="text-center mb-4">إنشاء حساب جديد</h3>
+{% block title %}إنشاء حساب جديد{% endblock %}
 
-                    <!-- عرض الرسائل والتنبيهات -->
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4 fw-bold">إنشاء حساب جديد</h3>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
                     {% endif %}
 
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <!-- عرض أخطاء النموذج العامة إذا وجدت -->
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {% for error in form.non_field_errors %}
-                                    <p class="mb-0">{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text text-muted" style="font-size: 0.85rem;">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
 
-                        <!-- عرض حقول النموذج تلقائياً بأسلوب مرتب -->
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <div class="form-text text-muted" style="font-size: 0.85rem;">{{ field.help_text }}</div>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <div class="text-danger small mt-1">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endfor %}
+                    <button type="submit" class="btn btn-success w-100 py-2 mt-3">إنشاء الحساب</button>
+                </form>
 
-                        <button type="submit" class="btn btn-success w-100 py-2 mt-3">إنشاء الحساب</button>
-                    </form>
-
-                    <hr class="my-4">
-                    
-                    <div class="text-center">
-                        <p class="mb-0 text-muted">لديك حساب بالفعل؟ <a href="{% url 'accounts:login' %}" class="text-decoration-none">تسجيل الدخول</a></p>
-                    </div>
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="mb-0 text-muted">لديك حساب بالفعل؟ <a href="{% url 'accounts:login' %}" class="text-decoration-none">تسجيل الدخول</a></p>
                 </div>
             </div>
         </div>
@@ -66,13 +55,10 @@
 </div>
 
 <script>
-    // إضافة تنسيقات Bootstrap للحقول القادمة من جانغو تلقائياً
     document.querySelectorAll('input').forEach(input => {
-        if (input.type !== 'checkbox') {
+        if (input.type !== 'checkbox' && input.type !== 'hidden') {
             input.classList.add('form-control');
         }
     });
 </script>
-
-</body>
-</html>
+{% endblock %}
