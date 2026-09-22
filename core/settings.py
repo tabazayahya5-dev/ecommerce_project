@@ -141,3 +141,5 @@ MAILERS = {
 AUTH_USER_MODEL = 'accounts.User'
 
 CART_SESSION_ID = 'cart'
+
+LOGIN_URL = 'accounts:login'

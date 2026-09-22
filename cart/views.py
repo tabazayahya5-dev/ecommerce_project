@@ -18,6 +18,8 @@ def cart_add(request, product_id):
             quantity=cd['quantity'],
             override_quantity=cd['override']
         )
+    else:
+        cart.add(product=product, quantity=1, override_quantity=False)
     return redirect('cart:cart_detail')
 
 def cart_detail(request):
