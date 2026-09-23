@@ -11,24 +11,49 @@
     </a>
 </div>
 {% endif %}
+
 <div class="row g-4">
+    <!-- قائمة الأقسام -->
     <div class="col-md-3">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-primary text-white fw-bold">
-                <i class="fa-solid fa-layer-group me-1"></i> الأقسام
+            <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-layer-group me-1"></i> الأقسام</span>
+                
+                <!-- 🟢 زر إضافة قسم جديد للمدير -->
+                {% if user.is_staff %}
+                <a href="{% url 'products:category_create' %}" class="btn btn-sm btn-light text-primary py-0 px-2 fw-bold" title="إضافة قسم جديد">
+                    <i class="fas fa-plus me-1"></i>جديد
+                </a>
+                {% endif %}
             </div>
+            
             <ul class="list-group list-group-flush">
                 {% for category in categories %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ category.name }}
+                        <a href="{% url 'products:product_list_by_category' category.slug %}" class="text-decoration-none text-dark fw-semibold">
+                            {{ category.name }}
+                        </a>
+                        
+                        <!-- 🟢 أزرار تعديل وحذف القسم للمدير -->
+                        {% if user.is_staff %}
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'products:category_update' category.id %}" class="btn btn-link text-warning p-0 mx-1" title="تعديل">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'products:category_delete' category.id %}" class="btn btn-link text-danger p-0 mx-1" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                        {% endif %}
                     </li>
                 {% empty %}
-                    <li class="list-group-item text-muted">لا توجد أقسام</li>
+                    <li class="list-group-item text-muted text-center">لا توجد أقسام حالياً</li>
                 {% endfor %}
             </ul>
         </div>
     </div>
 
+    <!-- قائمة المنتجات -->
     <div class="col-md-9">
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% for product in products %}

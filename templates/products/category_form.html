@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - المتجر الإلكتروني{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="fas {% if category %}fa-edit{% else %}fa-folder-plus{% endif %} me-2"></i>{{ title }}
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                        </label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text text-muted">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-right me-1"></i> إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="fas fa-save me-1"></i> حفظ القسم
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

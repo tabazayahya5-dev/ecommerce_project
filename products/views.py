@@ -1,7 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import Category, Product
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import ProductForm
+from .forms import ProductForm , CategoryForm
 from django.contrib import messages
 
 
@@ -66,3 +66,39 @@ def product_delete(request, id):
         return redirect('products:product_list')
     
     return render(request, 'products/product_confirm_delete.html', {'product': product})
+
+
+@staff_member_required
+def category_create(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'تم إضافة القسم "{category.name}" بنجاح!')
+            return redirect('products:product_list')
+    else:
+        form = CategoryForm()
+    return render(request, 'products/category_form.html', {'form': form, 'title': 'إضافة قسم جديد'})
+
+@staff_member_required
+def category_update(request, id):
+    category = get_object_or_404(Category, id=id)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'تم تحديث القسم "{category.name}" بنجاح!')
+            return redirect('products:product_list')
+    else:
+        form = CategoryForm(instance=category)
+    return render(request, 'products/category_form.html', {'form': form, 'category': category, 'title': 'تعديل القسم'})
+
+@staff_member_required
+def category_delete(request, id):
+    category = get_object_or_404(Category, id=id)
+    if request.method == 'POST':
+        category_name = category.name
+        category.delete()
+        messages.success(request, f'تم حذف القسم "{category_name}" بنجاح.')
+        return redirect('products:product_list')
+    return render(request, 'products/category_confirm_delete.html', {'category': category})
