@@ -28,19 +28,26 @@
             </div>
             
             <ul class="list-group list-group-flush">
-                {% for category in categories %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="{% url 'products:product_list_by_category' category.slug %}" class="text-decoration-none text-dark fw-semibold">
-                            {{ category.name }}
+                <!-- 🟢 خيار عرض جميع المنتجات -->
+                <li class="list-group-item {% if not category %}bg-primary bg-opacity-10 fw-bold{% endif %}">
+                    <a href="{% url 'products:product_list' %}" class="text-decoration-none text-dark d-block">
+                        <i class="fas fa-boxes me-1 text-primary"></i> جميع المنتجات
+                    </a>
+                </li>
+
+                {% for c in categories %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center {% if category and category.slug == c.slug %}bg-primary bg-opacity-10 fw-bold{% endif %}">
+                        <a href="{% url 'products:product_list_by_category' c.slug %}" class="text-decoration-none text-dark fw-semibold flex-grow-1">
+                            {{ c.name }}
                         </a>
                         
                         <!-- 🟢 أزرار تعديل وحذف القسم للمدير -->
                         {% if user.is_staff %}
                         <div class="btn-group btn-group-sm">
-                            <a href="{% url 'products:category_update' category.id %}" class="btn btn-link text-warning p-0 mx-1" title="تعديل">
+                            <a href="{% url 'products:category_update' c.id %}" class="btn btn-link text-warning p-0 mx-1" title="تعديل">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="{% url 'products:category_delete' category.id %}" class="btn btn-link text-danger p-0 mx-1" title="حذف">
+                            <a href="{% url 'products:category_delete' c.id %}" class="btn btn-link text-danger p-0 mx-1" title="حذف">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -55,6 +62,10 @@
 
     <!-- قائمة المنتجات -->
     <div class="col-md-9">
+        {% if category %}
+            <h4 class="mb-3 text-secondary fw-bold">المنتجات في قسم: <span class="text-primary">{{ category.name }}</span></h4>
+        {% endif %}
+
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% for product in products %}
                 <div class="col">
@@ -90,7 +101,11 @@
             {% empty %}
                 <div class="col-12">
                     <div class="alert alert-info text-center" role="alert">
-                        لا توجد منتجات حالياً.
+                        {% if category %}
+                            لا توجد منتجات في قسم "{{ category.name }}" حالياً.
+                        {% else %}
+                            لا توجد منتجات حالياً.
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}
