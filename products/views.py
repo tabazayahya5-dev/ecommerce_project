@@ -1,6 +1,10 @@
-from django.shortcuts import render
+from django.contrib.admin.views.decorators import staff_member_required
 from .models import Category, Product
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from .forms import ProductForm
+from django.contrib import messages
+
+
 
 def product_list(request):
     categories = Category.objects.all()
@@ -12,6 +16,53 @@ def product_list(request):
     }
     return render(request, 'products/product_list.html', context)
 
-def product_detail(request , slug):
-    product = get_object_or_404(Product, slug=slug, is_active=True)
+def product_detail(request, id, slug):
+    product = get_object_or_404(Product, id=id, slug=slug)
     return render(request, 'products/product_detail.html', {'product': product})
+
+
+
+@staff_member_required
+def product_create(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save()
+            messages.success(request, f'تم إضافة المنتج "{product.name}" بنجاح!')
+            return redirect('products:product_detail', id=product.id, slug=product.slug)
+    else:
+        form = ProductForm()
+    
+    return render(request, 'products/product_form.html', {
+        'form': form,
+        'title': 'إضافة منتج جديد'
+    })
+
+@staff_member_required
+def product_update(request, id):
+    product = get_object_or_404(Product, id=id)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            product = form.save()
+            messages.success(request, f'تم تحديث المنتج "{product.name}" بنجاح!')
+            return redirect('products:product_detail', id=product.id, slug=product.slug)
+    else:
+        form = ProductForm(instance=product)
+    
+    return render(request, 'products/product_form.html', {
+        'form': form,
+        'product': product,
+        'title': 'تعديل المنتج'
+    })
+
+@staff_member_required
+def product_delete(request, id):
+    product = get_object_or_404(Product, id=id)
+    if request.method == 'POST':
+        product_name = product.name
+        product.delete()
+        messages.success(request, f'تم حذف المنتج "{product_name}" بنجاح.')
+        return redirect('products:product_list')
+    
+    return render(request, 'products/product_confirm_delete.html', {'product': product})
