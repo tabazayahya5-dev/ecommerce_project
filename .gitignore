@@ -1,3 +1,18 @@
+# Virtual environments
 venv/
-__pycache__/
+.venv/
+ENV/
+env/
+
+# Pipenv
+Pipfile.lock
+
+# Database & Cache
+*.sqlite3
 db.sqlite3
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
