@@ -14,6 +14,8 @@ urlpatterns = [
 
     path('api/v1/cart/', include('cart.api_urls')),
 
+    path('api/v1/orders/', include('orders.api_urls')),
+
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('accounts/', include('allauth.urls')),
     path('cart/', include('cart.urls', namespace='cart')),
