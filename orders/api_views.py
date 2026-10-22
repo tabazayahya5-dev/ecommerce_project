@@ -31,26 +31,39 @@ class OrderListCreateView(generics.ListCreateAPIView):
             )
 
         with transaction.atomic():
+            for item in cart_items:
+                if item.quantity > item.product.stock:
+                    return Response(
+                        {
+                            "detail": f"الكمية المطلوبة للمنتج '{item.product.name}' غير متوفرة. المتبقي في المخزون: {item.product.stock}"
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             order = serializer.save(user=request.user)
 
-            order_items = [
-                OrderItem(
-                    order=order,
-                    product=item.product,
-                    price=item.product.price, 
-                    quantity=item.quantity
+            order_items = []
+            for item in cart_items:
+                order_items.append(
+                    OrderItem(
+                        order=order,
+                        product=item.product,
+                        price=item.product.price,
+                        quantity=item.quantity
+                    )
                 )
-                for item in cart_items
-            ]
-            OrderItem.objects.bulk_create(order_items)
+                
+                product = item.product
+                product.stock -= item.quantity
+                product.save()
 
+            OrderItem.objects.bulk_create(order_items)
             cart_items.delete()
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
 
 class OrderDetailView(generics.RetrieveAPIView):
     serializer_class = OrderSerializer
