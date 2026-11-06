@@ -62,12 +62,8 @@ class OrderListCreateView(generics.ListCreateAPIView):
             OrderItem.objects.bulk_create(order_items)
             cart_items.delete()
 
-        #Celery إرسال المهمة للعمل في الخلفية عبر 
-        send_order_confirmation_email.delay(
-            username=request.user.username,
-            user_email=request.user.email,
-            order_id=order.id,
-        )
+        user_email = request.user.email  
+        send_order_confirmation_email.delay(order.id, user_email)
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

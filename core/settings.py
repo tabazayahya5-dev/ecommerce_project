@@ -214,8 +214,14 @@ SIMPLE_JWT = {
 }
 
 # Email Configuration (Development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@ecommerce.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'tabazayahya5@gmail.com'  # ضع إيميل Gmail الخاّص بك هنا (المُرسِل)
+EMAIL_HOST_PASSWORD = 'ouzeznkkjuobqtgv' # ضع الـ App Password الخاصة بـ Google هنا
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Celery & Redis Configuration
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
