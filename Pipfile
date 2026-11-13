@@ -11,6 +11,9 @@ django-filter = "*"
 django-allauth = "*"
 mysqlclient = "*"
 requests = "*"
+django-redis = "*"
+celery = "*"
+redis = "*"
 
 [dev-packages]
 
