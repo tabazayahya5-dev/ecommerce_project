@@ -14,6 +14,7 @@ requests = "*"
 django-redis = "*"
 celery = "*"
 redis = "*"
+drf-spectacular = "*"
 
 [dev-packages]
 
