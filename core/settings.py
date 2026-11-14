@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+SECRET_KEY = os.environ.get('SECRET_KEY', 'your-default-secret-key')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -108,20 +112,21 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+# Database Configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'myproject_db',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'host.docker.internal',
-        'PORT': '3306',
+        'NAME': os.environ.get('DB_NAME', 'myproject_db'),
+        'USER': os.environ.get('DB_USER', 'root'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'host.docker.internal'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES', default_storage_engine=InnoDB",
             'charset': 'utf8mb4',
         },
     }
-} 
+}
 
 
 # Password validation
@@ -213,14 +218,14 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# Email Configuration (Development)
+# Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'tabazayahya5@gmail.com'  # ضع إيميل Gmail الخاّص بك هنا (المُرسِل)
-EMAIL_HOST_PASSWORD = 'ouzeznkkjuobqtgv' # ضع الـ App Password الخاصة بـ Google هنا
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Celery & Redis Configuration
