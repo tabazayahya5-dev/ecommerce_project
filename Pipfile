@@ -15,6 +15,7 @@ django-redis = "*"
 celery = "*"
 redis = "*"
 drf-spectacular = "*"
+stripe = "*"
 
 [dev-packages]
 

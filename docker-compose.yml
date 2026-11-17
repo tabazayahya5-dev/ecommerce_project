@@ -21,6 +21,21 @@ services:
     ports:
       - "6379:6379"
 
+  celery:
+    build: .
+    command: celery -A core worker -l info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_healthy
+
   db:
     image: mysql:8.4
     restart: always

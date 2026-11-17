@@ -6,6 +6,11 @@ from cart.models import Cart
 from .models import Order, OrderItem
 from .serializers import OrderSerializer
 from .tasks import send_order_confirmation_email
+import stripe
+from django.conf import settings
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 
 class OrderListCreateView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
@@ -74,3 +79,91 @@ class OrderDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
+
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+class CreateCheckoutSessionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, order_id, *args, **kwargs):
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+
+        if order.paid:
+            return Response(
+                {"detail": "هذا الطلب مدفوع مسبقاً."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        line_items = []
+        for item in order.items.all():
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'unit_amount': int(item.price * 100),
+                    'product_data': {
+                        'name': item.product.name,
+                    },
+                },
+                'quantity': item.quantity,
+            })
+
+        try:
+            checkout_session = stripe.checkout.Session.create(
+                line_items=line_items,
+                mode='payment',
+                success_url='http://127.0.0.1:8000/payment-success/',
+                cancel_url='http://127.0.0.1:8000/payment-cancel/',
+                metadata={
+                    'order_id': order.id
+                }
+            )
+            order.stripe_session_id = checkout_session.id
+            order.save()
+
+            return Response(
+                {"checkout_url": checkout_session.url},
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+
+class StripeWebhookView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        payload = request.body
+        sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+        endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, endpoint_secret
+            )
+        except ValueError:
+            return Response({"detail": "Invalid payload"}, status=status.HTTP_400_BAD_REQUEST)
+        except stripe.error.SignatureVerificationError:
+            return Response({"detail": "Invalid signature"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if event['type'] == 'checkout.session.completed':
+            session = event['data']['object'].to_dict()
+            order_id = session.get('metadata', {}).get('order_id')
+
+            if order_id:
+                try:
+                    order = Order.objects.get(id=order_id)
+                    if not order.paid:
+                        order.paid = True
+                        order.status = 'processing'
+                        order.save()
+                except Order.DoesNotExist:
+                    return Response({"detail": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_200_OK)
