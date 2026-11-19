@@ -13,23 +13,19 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 import os
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'your-default-secret-key')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is required!")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+DEBUG = os.environ.get('DEBUG', 'False').strip().lower() in ('true', '1', 'yes')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^y8s4!xafs_p-cqlqh@nu5vikd=r%1mlp+e%x-x#apjhx6*ne*'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -73,10 +69,6 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 # إعادة التوجيه بعد تسجيل الدخول أو الخروج
 LOGIN_REDIRECT_URL = '/'       
 LOGOUT_REDIRECT_URL = '/'      
-# إعدادات الحساب والتسجيل
-ACCOUNT_EMAIL_REQUIRED = True         
-ACCOUNT_USERNAME_REQUIRED = False     
-ACCOUNT_AUTHENTICATION_METHOD = 'email' 
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -96,7 +88,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -166,24 +158,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-
-# MAILERS = {
-#     'default': {
-#         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-#     },
-# }
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 AUTH_USER_MODEL = 'accounts.User'
 
 CART_SESSION_ID = 'cart'
 
-LOGIN_URL = 'accounts:login'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -256,10 +236,15 @@ CACHES = {
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
 
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://127.0.0.1:5500')
 
 #محلياً أثناء التطوير  CORS الربط مع الفرونت 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False').strip().lower() in ('true', '1', 'yes')
+
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+    if origin.strip()
+]
 
 STRIPE_SUCCESS_URL = os.getenv(
     "STRIPE_SUCCESS_URL", "http://127.0.0.1:8000/api/docs/swagger/"
@@ -267,3 +252,13 @@ STRIPE_SUCCESS_URL = os.getenv(
 STRIPE_CANCEL_URL = os.getenv(
     "STRIPE_CANCEL_URL", "http://127.0.0.1:8000/api/docs/swagger/"
 )
+
+# Production Security Settings (active when DEBUG is False)
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True').strip().lower() in ('true', '1', 'yes')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
