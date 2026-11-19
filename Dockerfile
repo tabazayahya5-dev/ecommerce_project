@@ -18,3 +18,5 @@ COPY Pipfile Pipfile.lock /app/
 RUN pipenv install --system --deploy
 
 COPY . /app/
+
+RUN mkdir -p /app/staticfiles
