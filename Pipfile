@@ -16,6 +16,7 @@ celery = "*"
 redis = "*"
 drf-spectacular = "*"
 stripe = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'cart',
     "orders",
 
+    'corsheaders',
+
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -77,6 +79,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email' 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -253,3 +256,15 @@ CACHES = {
 # Stripe Configuration
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
+
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://127.0.0.1:5500')
+
+#محلياً أثناء التطوير  CORS الربط مع الفرونت 
+CORS_ALLOW_ALL_ORIGINS = True
+
+STRIPE_SUCCESS_URL = os.getenv(
+    "STRIPE_SUCCESS_URL", "http://127.0.0.1:8000/api/docs/"
+)
+STRIPE_CANCEL_URL = os.getenv(
+    "STRIPE_CANCEL_URL", "http://127.0.0.1:8000/api/docs/"
+)

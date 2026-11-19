@@ -113,11 +113,9 @@ class CreateCheckoutSessionView(APIView):
             checkout_session = stripe.checkout.Session.create(
                 line_items=line_items,
                 mode='payment',
-                success_url='http://127.0.0.1:8000/payment-success/',
-                cancel_url='http://127.0.0.1:8000/payment-cancel/',
-                metadata={
-                    'order_id': order.id
-                }
+                success_url=settings.STRIPE_SUCCESS_URL,
+                cancel_url=settings.STRIPE_CANCEL_URL,
+                metadata={'order_id': order.id}
             )
             order.stripe_session_id = checkout_session.id
             order.save()
