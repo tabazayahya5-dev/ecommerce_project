@@ -103,7 +103,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'cart.context_processors.cart',
             ],
         },
     },
@@ -263,8 +262,8 @@ FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://127.0.0.1:5500')
 CORS_ALLOW_ALL_ORIGINS = True
 
 STRIPE_SUCCESS_URL = os.getenv(
-    "STRIPE_SUCCESS_URL", "http://127.0.0.1:8000/api/docs/"
+    "STRIPE_SUCCESS_URL", "http://127.0.0.1:8000/api/docs/swagger/"
 )
 STRIPE_CANCEL_URL = os.getenv(
-    "STRIPE_CANCEL_URL", "http://127.0.0.1:8000/api/docs/"
+    "STRIPE_CANCEL_URL", "http://127.0.0.1:8000/api/docs/swagger/"
 )
