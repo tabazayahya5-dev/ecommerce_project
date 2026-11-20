@@ -211,21 +211,33 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Celery & Redis Configuration
+# Celery & Redis Configuration
 REDIS_HOST = os.environ.get('REDIS_HOST', 'redis')
+REDIS_URL = os.environ.get('REDIS_URL')
 
-CELERY_BROKER_URL = f'redis://{REDIS_HOST}:6379/0'
-CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:6379/0'
+if REDIS_URL:
+    CELERY_BROKER_URL = REDIS_URL
+    CELERY_RESULT_BACKEND = REDIS_URL
+    CACHE_LOCATION = REDIS_URL
+    if REDIS_URL.startswith('rediss://'):
+        CELERY_BROKER_USE_SSL = {'ssl_cert_reqs': 'none'}
+        CELERY_REDIS_BACKEND_USE_SSL = {'ssl_cert_reqs': 'none'}
+else:
+    CELERY_BROKER_URL = f'redis://{REDIS_HOST}:6379/0'
+    CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:6379/0'
+    CACHE_LOCATION = f'redis://{REDIS_HOST}:6379/1'
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Gaza' 
+CELERY_TIMEZONE = 'Asia/Gaza'
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {'global_keyprefix': 'ecommerce'}
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{REDIS_HOST}:6379/1",
+        "LOCATION": CACHE_LOCATION,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
