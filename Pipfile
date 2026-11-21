@@ -18,6 +18,7 @@ drf-spectacular = "*"
 stripe = "*"
 django-cors-headers = "*"
 gunicorn = "*"
+whitenoise = "*"
 
 [dev-packages]
 
