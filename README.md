@@ -1,38 +1,45 @@
 # E-Commerce Platform & REST API
 
-A scalable, production-ready E-Commerce backend built with Python, Django, and Django REST Framework (DRF). Originally developed using server-rendered Django Templates, the architecture has been expanded into a hybrid system featuring a decoupled Headless RESTful API, asynchronous background tasks, Redis caching, and complete Docker containerization.
+A backend e-commerce system built with **Python**, **Django**, and **Django REST Framework (DRF)**, featuring a RESTful API, asynchronous background tasks with **Celery**, caching with **Redis**, **MySQL** persistence, **Stripe** payments with Webhooks, and **Docker** deployment on **Render**[cite: 4, 10, 12, 15].
+
+## Live Deployment & API Docs
+- **Base URL:** `https://ecommerce-api-siw5.onrender.com`[cite: 4]
+- **Swagger UI:** `https://ecommerce-api-siw5.onrender.com/api/docs/swagger/`[cite: 4]
 
 ## Key Features
-- **Hybrid Architecture:** Supports both traditional server-rendered views (Django Templates) and a full-featured RESTful API.
-- **Authentication & Profiles:** Secure JWT-based authentication alongside custom user models and address management endpoints.
-- **Cart & Atomic Checkout:** Modular Cart and CartItem APIs with automatic total calculation, stock validation, inventory deduction, and atomic database transactions.
-- **Redis Caching:** Speeds up product responses and reduces database load with automated cache invalidation signals.
-- **Celery Background Tasks:** Sends order confirmation emails via Gmail SMTP asynchronously without blocking client requests.
-- **Interactive API Documentation:** Auto-generated OpenAPI documentation accessible via Swagger UI and ReDoc.
-- **Docker Containerization:** Runs the entire multi-service environment easily with a single command.
+- **Authentication & Role-Based Permissions:** JWT authentication (`access` and `refresh` tokens)[cite: 4], custom user & address models[cite: 1, 15], and admin-restricted write access (`403 Forbidden` for non-admin users) on products and categories[cite: 14].
+- **Catalog & Filtering:** Category and product endpoints supporting filtering, search, ordering, and response caching[cite: 11].
+- **Cart & Orders:** Cart and order management endpoints with Stripe payment session initiation (`/api/v1/orders/{order_id}/pay/`) and Webhook handling (`/api/v1/orders/webhook/`) to mark paid orders and update order status automatically[cite: 11, 12, 15].
+- **Redis Caching & Celery Tasks:** Uses Redis for caching/broker alongside Celery workers for asynchronous background tasks (such as order confirmation notifications)[cite: 15].
+- **Interactive API Documentation:** OpenAPI schema & Swagger UI exposed for testing endpoints[cite: 4, 11, 15].
+- **Containerized & Deployed:** Dockerized application deployed on Render with external MySQL and Redis services[cite: 4, 15].
 
 ## Tech Stack
-- **Backend:** Python 3.13, Django, Django REST Framework (DRF)
-- **Database:** MySQL
-- **Cache & Broker:** Redis (`django-redis`)
-- **Task Queue:** Celery
-- **Dependency Management:** Pipenv
-- **Documentation:** `drf-spectacular` (Swagger / ReDoc)
-- **Containerization:** Docker, Docker Compose
+- **Backend:** Python, Django, Django REST Framework (DRF)[cite: 15]
+- **Database:** MySQL[cite: 15]
+- **Cache & Broker:** Redis[cite: 15]
+- **Task Queue:** Celery[cite: 15]
+- **Payments:** Stripe API & Webhooks[cite: 10]
+- **Dependency Management:** Pipenv (`Pipfile` / `Pipfile.lock`)[cite: 15]
+- **Documentation:** `drf-spectacular` (Swagger UI)[cite: 4, 15]
+- **Containerization & Hosting:** Docker, Render[cite: 4, 15]
 
-## How to Run (Docker)
-1. Clone the repository and navigate to the project folder.
-2. Build and start the containers:
+## Environment Variables
+Configure the required environment variables in your local `.env` file and in your hosting platform (e.g., Render):
+- `SECRET_KEY`
+- `DEBUG`
+- `ALLOWED_HOSTS`
+- MySQL database connection variables
+- Redis / Celery broker & cache connection URLs
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`[cite: 7]
+- `STRIPE_SUCCESS_URL` (e.g., `https://ecommerce-api-siw5.onrender.com/api/docs/swagger/`)[cite: 4, 6]
+- `STRIPE_CANCEL_URL` (e.g., `https://ecommerce-api-siw5.onrender.com/api/docs/swagger/`)[cite: 4, 6]
+
+## Running Locally
+1. Clone the repository and install dependencies using `pipenv install --dev` (or run via Docker)[cite: 15].
+2. Configure your `.env` file with database, Redis, and Stripe variables[cite: 7, 15].
+3. Run migrations and start the development server / worker:
    ```bash
-   docker compose up --build
-   ```
-3. Access the application and interactive documentation:
-   - **Web App / API Root:** http://127.0.0.1:8000/
-   - **Swagger Docs:** http://127.0.0.1:8000/api/schema/swagger-ui/
-   - **ReDoc Docs:** http://127.0.0.1:8000/api/schema/redoc/
-
-## Running Tests
-To execute the unit and API test suite inside the container:
-```bash
-docker compose exec web python manage.py test
-```
+   python manage.py migrate
+   python manage.py runserver
